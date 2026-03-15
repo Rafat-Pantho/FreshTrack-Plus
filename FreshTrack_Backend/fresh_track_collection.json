@@ -1,0 +1,185 @@
+{
+  "info": {
+    "_postman_id": "freshtrack-api-collection",
+    "name": "FreshTrack+ API Collection",
+    "description": "API collection for FreshTrack+ Grocery Management System.\n\nIncludes endpoints for:\n- Analytics & Waste Management\n- Smart Meal Planning\n\nMake sure the server is running on http://localhost:5000 before testing.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Analytics",
+      "description": "Endpoints for waste risk analysis and inventory health monitoring",
+      "item": [
+        {
+          "name": "Get Waste Risk Analysis",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/analytics/waste-risk",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "analytics", "waste-risk"]
+            },
+            "description": "Fetches all grocery items and categorizes them by expiry status:\n- **Expired**: expiryDate < Current Date\n- **High Risk**: expiryDate within 3 days (Donate Recommendation)\n- **Safe**: expiryDate more than 3 days away\n\nReturns categorized items with actionable insights."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Inventory Health Score",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/analytics/inventory-health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "analytics", "inventory-health"]
+            },
+            "description": "Returns an inventory health score (0-100) based on:\n- Number of expired items\n- Number of at-risk items\n- Total inventory count\n\nAlso provides status (Excellent/Good/Fair/Poor/Critical) and recommendations."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Waste Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/analytics/waste-stats?period=30",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "analytics", "waste-stats"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "30",
+                  "description": "Number of days to analyze (default: 30)"
+                }
+              ]
+            },
+            "description": "Returns waste statistics including:\n- Total waste by reason\n- Most wasted items\n- Daily averages\n- Recent waste logs"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Meal Planning",
+      "description": "Endpoints for smart meal planning and TDEE calculation",
+      "item": [
+        {
+          "name": "Generate Meal Plan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"weight\": 75,\n  \"height\": 175,\n  \"age\": 25,\n  \"gender\": \"male\",\n  \"activityLevel\": 1.55,\n  \"dietaryPreferences\": [\"Vegetarian\"]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/meal-plan/generate",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "meal-plan", "generate"]
+            },
+            "description": "Generates a smart daily meal plan based on user profile.\n\n**Algorithm:**\n1. Calculates BMR using Mifflin-St Jeor Equation\n2. Multiplies by activity level for TDEE\n3. Uses recursive function to generate meals for Breakfast, Lunch, Dinner, Snack\n4. Ensures final plan is within ±10% of TDEE\n\n**Activity Levels:**\n- 1.2: Sedentary\n- 1.375: Lightly active\n- 1.55: Moderately active\n- 1.725: Very active\n- 1.9: Extra active\n\n**Dietary Preferences:**\nVegan, Vegetarian, Gluten-Free, Dairy-Free, Nut-Free, Keto, Paleo, etc."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Available Ingredients",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/meal-plan/ingredients?mealType=Lunch",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "meal-plan", "ingredients"],
+              "query": [
+                {
+                  "key": "mealType",
+                  "value": "Lunch",
+                  "description": "Type of meal (Breakfast, Lunch, Dinner, Snack)"
+                },
+                {
+                  "key": "dietaryPreferences",
+                  "value": "Vegetarian",
+                  "description": "Comma-separated dietary preferences",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Returns available grocery items suitable for a specific meal type.\n\nFilters by:\n- Meal type category preferences\n- Dietary restrictions\n- Non-expired items only\n\nSorted by expiry date (prioritizes items expiring soon)."
+          },
+          "response": []
+        },
+        {
+          "name": "Calculate TDEE Only",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"weight\": 75,\n  \"height\": 175,\n  \"age\": 25,\n  \"gender\": \"male\",\n  \"activityLevel\": 1.55\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/meal-plan/calculate-tdee",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "meal-plan", "calculate-tdee"]
+            },
+            "description": "Calculates Total Daily Energy Expenditure (TDEE) without generating a meal plan.\n\n**Mifflin-St Jeor Equation:**\n- Men: (10 × weight) + (6.25 × height) - (5 × age) + 5\n- Women: (10 × weight) + (6.25 × height) - (5 × age) - 161\n\n**TDEE = BMR × Activity Level**"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "description": "Server health and status endpoints",
+      "item": [
+        {
+          "name": "API Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [""]
+            },
+            "description": "Returns API status and version information."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    }
+  ]
+}

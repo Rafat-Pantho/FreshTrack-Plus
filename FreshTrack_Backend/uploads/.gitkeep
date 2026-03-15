@@ -1,0 +1,15 @@
+# Uploads Directory
+
+This folder stores uploaded files (images) for FreshTrack+.
+
+## Structure
+- Profile images
+- Grocery item images
+
+## Notes
+- Files are named using the format: `{fieldname}-{timestamp}-{random}.{extension}`
+- Maximum file size: 5MB
+- Allowed formats: JPEG, PNG, GIF, WebP
+
+## Important
+Do not commit uploaded files to version control.
